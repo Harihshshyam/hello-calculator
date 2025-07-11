@@ -5,7 +5,6 @@ pipeline {
             args  '-u root:root'
         }
     }
-
     stages {
         stage('Checkout') {
             steps {
@@ -32,7 +31,6 @@ pipeline {
             }
         }
     }
-
     post {
         success { echo '✅ Tests passed and artifacts archived!' }
         failure { echo '❌ कुछ फेल हुआ—लॉग देखें।' }
