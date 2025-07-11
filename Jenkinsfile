@@ -8,13 +8,14 @@ pipeline {
             }
         }
 
-        stage('Setup & Install') {
+        stage('Install Dependencies') {
             steps {
+                // Install pytest into the workspace-local .local directory
                 sh '''
-                  python3 -m venv venv
-                  . venv/bin/activate
-                  pip install --upgrade pip
-                  pip install -r requirements.txt
+                  python3 -m pip install --upgrade --user pip
+                  python3 -m pip install --user -r requirements.txt
+                  export PATH="$HOME/.local/bin:$PATH"
+                  which pytest  # sanity check
                 '''
             }
         }
@@ -22,7 +23,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                  . venv/bin/activate
+                  export PATH="$HOME/.local/bin:$PATH"
                   pytest --junitxml=results.xml
                 '''
             }
@@ -41,12 +42,8 @@ pipeline {
     }
 
     post {
-        success {
-            echo '✅ All tests passed and artifacts archived!'
-        }
-        failure {
-            echo '❌ Something failed, check logs!'
-        }
+        success { echo '✅ Tests passed and artifacts archived!' }
+        failure { echo '❌ Build or Tests failed – see console output.' }
     }
 }
 
