@@ -14,8 +14,10 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
-                  pip install --upgrade pip pytest
-                  pip install -r requirements.txt
+                  apt-get update
+                  apt-get install -y python3-pip
+                  pip3 install --upgrade pip pytest
+                  pip3 install -r requirements.txt
                 '''
             }
         }
@@ -23,7 +25,11 @@ pipeline {
             steps {
                 sh 'pytest --junitxml=results.xml'
             }
-            post { always { junit 'results.xml' } }
+            post {
+                always {
+                    junit 'results.xml'
+                }
+            }
         }
         stage('Archive Sources') {
             steps {
@@ -32,7 +38,11 @@ pipeline {
         }
     }
     post {
-        success { echo '✅ Tests passed and artifacts archived!' }
-        failure { echo '❌ कुछ फेल हुआ—लॉग देखें।' }
+        success {
+            echo '✅ Tests passed and artifacts archived!'
+        }
+        failure {
+            echo '❌ Build or Tests failed – see console output.'
+        }
     }
 }
