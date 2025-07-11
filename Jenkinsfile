@@ -1,31 +1,28 @@
 pipeline {
-    agent any
-
+    agent {
+        docker {
+            image 'python:3.9'
+            args  '-u root:root'
+        }
+    }
     stages {
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/Harihshshyam/hello-calculator.git', branch: 'main'
             }
         }
-
-        stage('Install Dependencies') {
+        stage('Install pip & Dependencies') {
             steps {
-                // Install pytest into the workspace-local .local directory
                 sh '''
-                  python3 -m pip install --upgrade --user pip
-                  python3 -m pip install --user -r requirements.txt
-                  export PATH="$HOME/.local/bin:$PATH"
-                  which pytest  # sanity check
+                  apt-get update && apt-get install -y python3-pip
+                  pip3 install --upgrade pip
+                  pip3 install -r requirements.txt
                 '''
             }
         }
-
         stage('Run Tests') {
             steps {
-                sh '''
-                  export PATH="$HOME/.local/bin:$PATH"
-                  pytest --junitxml=results.xml
-                '''
+                sh 'pytest --junitxml=results.xml'
             }
             post {
                 always {
@@ -33,17 +30,18 @@ pipeline {
                 }
             }
         }
-
-        stage('Archive') {
+        stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: 'app.py, test_app.py, requirements.txt', fingerprint: true
             }
         }
     }
-
     post {
-        success { echo '✅ Tests passed and artifacts archived!' }
-        failure { echo '❌ Build or Tests failed – see console output.' }
+        success {
+            echo '✅ Build and tests successful!'
+        }
+        failure {
+            echo '❌ Build or tests failed – check logs!'
+        }
     }
 }
-
