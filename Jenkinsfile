@@ -32,16 +32,4 @@ pipeline {
         }
         stage('Archive Artifacts') {
             steps {
-                archiveArtifacts artifacts: 'app.py, test_app.py, requirements.txt', fingerprint: true
-            }
-        }
-    }
-    post {
-        success {
-            echo '✅ Build and tests successful!'
-        }
-        failure {
-            echo '❌ Build or tests failed – check logs!'
-        }
-    }
-}
+                archiveA
