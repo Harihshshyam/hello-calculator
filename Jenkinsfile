@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'python:3.9'
-            args  '-u root:root'
+            args  '-u root:root'  // root user for installing system packages
         }
     }
     stages {
